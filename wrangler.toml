@@ -1,1 +1,3 @@
-assets = { directory = "public" }
+name = "serpentlua-server"
+main = "src/index.js"
+compatibility_date = "2026-04-13"
