@@ -2,9 +2,9 @@ import { entry as plugin } from "./routes/plugin.js"
 
 export default {
     async fetch(request, env, ctx) {
-        const { pathName } = new URL(request.url);
+        const { pathname } = new URL(request.url);
 
-        if (pathName === "/plugin") return plugin(request);
+        if (pathname === "/plugin") return plugin(request);
 
         return new Response("Nothing but us chickens!", { status: 404 });
     }
