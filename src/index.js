@@ -1,5 +1,11 @@
+import { entry as plugin } from ".routes/plugin.js"
+
 export default {
     async fetch(request, env, ctx) {
-        return new Response("fuck you");
+        const { pathName } = new URL(request.url);
+
+        if (pathName === "plugin") return plugin(request);
+
+        return new Response("Nothing but us chickens!", { status: 404 });
     }
 };
