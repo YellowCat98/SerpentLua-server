@@ -1,4 +1,4 @@
-import { entry as plugin } from ".routes/plugin.js"
+import { entry as plugin } from "routes/plugin.js"
 
 export default {
     async fetch(request, env, ctx) {
