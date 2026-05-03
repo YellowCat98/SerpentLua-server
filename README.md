@@ -1,3 +1,5 @@
-# SerpentLua Plugin repository
+# SerpentLua Plugin index
 
-- :sobh: fuck 
+- The server for SerpentLua's plugin index. This is a guide for how the API works.
+
+## uh
