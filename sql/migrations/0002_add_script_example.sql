@@ -1,0 +1,1 @@
+ALTER TABLE plugins ADD COLUMN script_example TEXT;
