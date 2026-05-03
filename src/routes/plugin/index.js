@@ -1,4 +1,4 @@
-// <url>/plugin
+// url/plugin
 // nothing really
 import { entry as add } from "./add.js"
 
