@@ -1,1 +1,1 @@
-ALTER TABLE plugins ADD COLUMN download_count INTEGER (download_count >= 0);
+ALTER TABLE plugins ADD COLUMN download_count INTEGER DEFAULT 0;
