@@ -5,6 +5,5 @@ CREATE TABLE IF NOT EXISTS plugins (
 	serpent_version TEXT,
 	description TEXT,
 	download_link TEXT,
-	id TEXT PRIMARY KEY,
-	script_example TEXT
+	id TEXT PRIMARY KEY
 );
