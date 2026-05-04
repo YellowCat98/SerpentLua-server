@@ -1,0 +1,1 @@
+ALTER TABLE user_status ADD COLUMN ban_reason TEXT;

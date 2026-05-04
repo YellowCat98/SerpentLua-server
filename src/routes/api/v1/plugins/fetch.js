@@ -10,7 +10,7 @@ async function single(request, env, ctx) {
 		.first();
 
 	if (plugin === null) {
-		return new Response(`Plugin of ID \"${params.get("id")}\" was not found.`, { status: 500 });
+		return new Response(`Plugin of ID \"${params.get("id")}\" was not found.`, { status: 404 });
 	} else {
 		return new Response( // looks way prettier if i wrap this one in else
 			JSON.stringify(plugin),
@@ -25,7 +25,7 @@ async function bulk(request, env, ctx) {
 	const url = new URL(request.url);
 	const params = url.searchParams;
 
-	
+	return new Response("boo");
 }
 
 export async function entry(request, env, ctx) {
