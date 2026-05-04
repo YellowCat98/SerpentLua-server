@@ -22,6 +22,7 @@ Returns JSON object: (these are pretty self explanatory. Any unclear ones are st
 - `release_date`: An integer. This is in unix timestamps.
 - `last_update_date`: An integer. This is in unix timestamps.
 - `download_link`: A string.
+- `featured`: A boolean.
 
 Usage: `{url}/api/v1/plugins/fetch?id=six.seven`
 
