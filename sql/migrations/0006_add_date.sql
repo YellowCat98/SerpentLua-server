@@ -1,0 +1,2 @@
+ALTER TABLE plugins ADD COLUMN release_date INTEGER DEFAULT 0;
+ALTER TABLE plugins ADD COLUMN last_update_date INTEGER DEFAULT 0;

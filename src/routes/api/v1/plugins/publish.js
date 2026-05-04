@@ -3,23 +3,27 @@
 
 export async function entry(request, env, ctx) {
 	const url = new URL(request.url);
-	const params = url.searchParams; // using query parameters for this one
+	const body = await request.json(); // using query parameters for this one
+
+	const date = Math.floor(Date.now() / 1000);
 
 	const data = {
-		name: params.get("name"),
-		developer: params.get("developer"),
-		version: params.get("version"),
-		serpent_version: params.get("serpent_version"),
-		description: params.get("description"),
-		download_link: params.get("download_link"),
-		id: params.get("id"),
-		script_example: params.get("script_example")
+		name: body.name,
+		developer: body.developer,
+		version: body.version,
+		serpent_version: body.serpent_version,
+		description: body.description,
+		download_link: body.download_link,
+		id: body.id,
+		script_example: body.script_example,
+		release_date: date,
+		last_update_date: date
 	};
 
 	try {
 		await env.DB.prepare(`
-			INSERT INTO plugins (name, developer, version, serpent_version, description, download_link, id, script_example)
-			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+			INSERT INTO plugins (name, developer, version, serpent_version, description, download_link, id, script_example, release_date, last_update_date)
+			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
 		`)
 		.bind(...Object.values(data))
 		.run();
@@ -31,5 +35,5 @@ export async function entry(request, env, ctx) {
 		}
 	}
 
-	return new Response(`ok`, { status: 200 });
+	return new Response(`ok`, { status: 201 });
 }

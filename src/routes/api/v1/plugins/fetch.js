@@ -1,7 +1,7 @@
 // url/plugin/get
 // gets a plugin by id
 
-export async function entry(request, env, ctx) {
+async function single(request, env, ctx) {
 	const url = new URL(request.url);
 	const params = url.searchParams;
 
@@ -9,10 +9,34 @@ export async function entry(request, env, ctx) {
 		.bind(params.get("id"))
 		.first();
 
-	return new Response(
-		JSON.stringify(plugin),
-		{
-			headers: { "Content-Type": "application/json" }
-		}
-	);
+	if (plugin === null) {
+		return new Response(`Plugin of ID \"${params.get("id")}\" was not found.`, { status: 500 });
+	} else {
+		return new Response( // looks way prettier if i wrap this one in else
+			JSON.stringify(plugin),
+			{
+				headers: { "Content-Type": "application/json" }
+			}
+		);
+	}
+}
+
+async function bulk(request, env, ctx) {
+	const url = new URL(request.url);
+	const params = url.searchParams;
+
+	
+}
+
+export async function entry(request, env, ctx) {
+	const url = new URL(request.url);
+	const params = url.searchParams;
+
+	const keys = [...params.keys()];
+
+	if (keys.length === 1 && keys[0] === "id") {
+		return single(request, env, ctx);
+	} else {
+		return bulk(request, env, ctx);
+	}
 }

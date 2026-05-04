@@ -1,14 +1,18 @@
-// url/plugin
-// nothing really
 import { entry as publish } from "./publish.js"
 import { entry as get } from "./fetch.js"
 
+const routes = [
+	{ path: "/api/v1/plugin/publish", method: "POST", handler: publish },
+	{ path: "/api/v1/plugin/fetch",   method: "GET",  handler: get },
+];
+
 export function entry(request, env, ctx) {
+	const { pathname } = new URL(request.url);
 
-    const { pathname } = new URL(request.url);
+	const route = routes.find(r => pathname.startsWith(r.path));
 
-    if (pathname.startsWith("/api/v1/plugin/publish")) return publish(request, env, ctx);
-    if (pathname.startsWith("/api/v1/plugin/fetch")) return get(request, env, ctx);
+	if (!route) return new Response("Nothing but us chickens!", { status: 404 });
+	if (request.method !== route.method) return new Response("Method not allowed.", { status: 405 });
 
-    return new Response("Nothing but us chickens!", { status: 404 });
+	return route.handler(request, env, ctx);
 }
