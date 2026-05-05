@@ -30,6 +30,12 @@ const sorts = {
 	most_downloaded: "download_count"
 };
 
+const statuses = {
+	approved: "approved",
+	rejected: "rejected",
+	pending: "pending"
+};
+
 // url/api/v1/fetch/bulk
 // returns a bunch of plugins
 async function bulk(request, env, ctx) {
@@ -49,6 +55,8 @@ async function bulk(request, env, ctx) {
 
 	let status = params.get("status");
 	if (!status) status = "approved";
+	status = statuses[status];
+	if (!status) status = "approved";
 
 	let page = params.get("page");
 	if (page) {
@@ -63,9 +71,9 @@ async function bulk(request, env, ctx) {
 		const placeholders = ids.map(() => "?").join(",");
 
 		const { results } = await env.DB.prepare(`
-			SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = '${status}' AND featured = ${featured}
+			SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = ? AND featured = ?
 			ORDER BY ${sort} DESC
-		`).bind(...ids).all();
+		`).bind(...ids, status, featured).all();
 
 		output = results
 	}
