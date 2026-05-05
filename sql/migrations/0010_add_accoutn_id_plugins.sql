@@ -1,0 +1,1 @@
+ALTER TABLE plugins ADD COLUMN account_id INTEGER DEFAULT 0;
