@@ -5,7 +5,7 @@
 ## Terms used
 - Session token: Much like RobTop's GJP, but expires every 3 hours. Should reauthenticate each game start.
 
-## GET /api/v1/plugins/fetch
+## GET /api/v1/plugin/fetch
 Fetches a plugin's data based on query parameter `id`.
 
 Returns JSON object: (these are pretty self explanatory. Any unclear ones are stated)
@@ -25,11 +25,11 @@ Returns JSON object: (these are pretty self explanatory. Any unclear ones are st
 - `featured`: A boolean.
 - `account_id`: An integer. The account that owns the plugin.
 
-Usage: `{url}/api/v1/plugins/fetch?id=six.seven`
+Usage: `{url}/api/v1/plugin/fetch?id=six.seven`
 
 Check `Content-Type` prior to using the response returned, if it's not `application/json` it's probably an error.
 
-## GET /api/v1/plugins/fetch/bulk
+## GET /api/v1/plugin/fetch/bulk
 Fetches multiple plugins.
 
 Has query parameters:
@@ -42,12 +42,12 @@ Has query parameters:
 
 Note that at least `ids` or `page` must be provided, `?sort=most_recent&featured=0` is not allowed.
 
-Returns a JSON object (array). All items of the array are the same as what the `GET /api/v1/plugins/fetch` endpoint returns.
+Returns a JSON object (array). All items of the array are the same as what the `GET /api/v1/plugin/fetch` endpoint returns.
 
-## POST /api/v1/plugins/publish
+## POST /api/v1/plugin/publish
 Publishes a plugin to the index. Data is passed in the JSON body.
 
-Must pass Session token as a header `Authorization` to the request. Otherwise the request will be cancelled.
+Must pass Session token as a header `Authorization` to the request. otherwise the request will be cancelled.
 
 JSON body must have: (These are self explanatory.)
 
@@ -60,10 +60,9 @@ JSON body must have: (These are self explanatory.)
 - `description`: A string.
 - `download_link`: A string.
 
-Responses:
+## PATCH /api/v1/plugin/update
+Updates an existing plugin on the index. Data is passed in the JSON body.
 
-- 201 Created: Succeeded.
-- 403 Forbidden: Means the user is banned, response is the ban reason.
-- 400 Bad Request: JSON body is missing keys. Response says what they are.
-- 409 Conflict: A plugin already uses this ID.
-- 500 Internal Error: Self explanatory.
+Must pass session token as a header `Authorization` otherwise the request will be cancelled.
+
+The JSON body is the same as the `POST /api/v1/plugin/publish` endpoint.
