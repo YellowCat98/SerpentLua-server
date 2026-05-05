@@ -3,7 +3,7 @@
 - The server for SerpentLua's plugin index. This is a guide for how the API works.
 
 ## Terms used
-- Session token: Much like RobTop's GJP, but expires every 3 hours. Reauthenticate with the server each
+- Session token: Much like RobTop's GJP, but expires every 3 hours. Should reauthenticate each game start.
 
 ## GET /api/v1/plugins/fetch
 Fetches a plugin's data based on query parameter `id`.
@@ -27,6 +27,19 @@ Returns JSON object: (these are pretty self explanatory. Any unclear ones are st
 Usage: `{url}/api/v1/plugins/fetch?id=six.seven`
 
 Check `Content-Type` prior to using the response returned, if it's not `application/json` it's probably an error.
+
+## GET /api/v1/plugins/fetch/bulk
+Fetches multiple plugins.
+
+Has query parameters:
+
+- `sort`: Can only be `most_recent` and `most_downloaded`.
+- `featured`: Can only be 1 or 0. Ignored on 0.
+- `status`: Can only be `approved`, `pending`, `rejected`.
+- `ids`: IDs separated by comma. (Optional)
+- `page`: Self explanatory. Returns at most 10 plugins. (Optional)
+
+Note that at least `ids` or `page` must be provided, `?sort=most_recent&featured=0` is not allowed.
 
 ## POST /api/v1/plugins/publish
 Publishes a plugin to the index. Data is passed in the JSON body.

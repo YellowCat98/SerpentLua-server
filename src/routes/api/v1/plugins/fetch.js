@@ -53,6 +53,9 @@ async function bulk(request, env, ctx) {
 	if (!featured) featured = 0;
 	else featured = parseInt(featured);
 
+	const featuredClause = featured ? "AND featured = ?" : "";
+	
+
 	let status = params.get("status");
 	if (!status) status = "approved";
 	status = statuses[status];
@@ -62,18 +65,31 @@ async function bulk(request, env, ctx) {
 	if (page) {
 		page = parseInt(page);
 		if (isNaN(page)) return new Response("page is NaN.", { status: 400 });
+
+		const perPage = 10;
+		
+		const offset = (page - 1) * 10;
+		const binds = featured ? [status, featured, offset] : [status, offset];
+		const { results } = await env.DB.prepare(`
+			SELECT * FROM plugins WHERE status = ? ${featuredClause}
+			ORDER BY ${sort} DESC
+			limit 10 OFFSET ?
+		`).bind(...binds).all();
+
+		output = results;
 	} else {
 		let ids = params.get("ids");
 		if (!ids) return new Response("Missing params.", { status: 400 });
 		ids = ids.split(",").filter(s => s.length > 0).map(s => s.trim());
-		if (ids.length >= 20) return new Response("Too many IDs.");
+		if (ids.length >= 20) return new Response("Too many IDs.", { status: 400 });
 
 		const placeholders = ids.map(() => "?").join(",");
 
+		const binds = featured ? [...ids, status, featured] : [...ids, status];
 		const { results } = await env.DB.prepare(`
-			SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = ? AND featured = ?
+			SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = ? ${featuredClause}
 			ORDER BY ${sort} DESC
-		`).bind(...ids, status, featured).all();
+		`).bind(...binds).all();
 
 		output = results
 	}
