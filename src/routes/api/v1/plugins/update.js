@@ -1,7 +1,7 @@
 // url/api/v1/plugin/update
 // updates a plugin
 
-import * as utils from "./../../../../auth/helper.js"
+import * as utils from "../../../../utils.js"
 
 export async function entry(request, env, ctx) {
 	const url = new URL(request.url);
@@ -51,7 +51,7 @@ export async function entry(request, env, ctx) {
 		download_link: body.download_link,
 		script_example: body.script_example ?? "",
 		last_update_date: date,
-		status: status?.status === "verified" ? "approved" : "pending"
+		status: utils.resolveStatus(status?.status, "verified") ? "approved" : "pending"
 	};
 
 	const fields = Object.keys(data).map(k => `${k} = ?`).join(", ");

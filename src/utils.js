@@ -1,5 +1,3 @@
-// a simple helper for authenticating session
-
 export async function getSession(request, env) {
 	const session_token = request.headers.get("Authorization");
 	if (!session_token) return [null, new Response("Unauthorized", { status: 401 })];
@@ -31,4 +29,11 @@ export async function getStatus(account_id, env) {
 		status: row.status,
 		ban_reason: row.ban_reason ?? null
 	}
+}
+
+export const ranks = ["banned", "verified", "staff", "admin", "owner"];
+
+// behaves as a "at least is rank" function.
+export function resolveStatus(status, required) {
+	return ranks.indexOf(status) >= ranks.indexOf(required);
 }

@@ -1,7 +1,7 @@
 // url/api/v1/plugin/publish
 // adds a new entry
 
-import * as utils from "./../../../../auth/helper.js"
+import * as utils from "../../../../utils.js"
 // lol!
 
 export async function entry(request, env, ctx) {
