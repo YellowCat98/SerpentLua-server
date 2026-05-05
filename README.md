@@ -23,6 +23,7 @@ Returns JSON object: (these are pretty self explanatory. Any unclear ones are st
 - `last_update_date`: An integer. This is in unix timestamps.
 - `download_link`: A string.
 - `featured`: A boolean.
+- `account_id`: An integer. The account that owns the plugin.
 
 Usage: `{url}/api/v1/plugins/fetch?id=six.seven`
 
@@ -40,6 +41,8 @@ Has query parameters:
 - `page`: Self explanatory. Returns at most 10 plugins. (Optional)
 
 Note that at least `ids` or `page` must be provided, `?sort=most_recent&featured=0` is not allowed.
+
+Returns a JSON object (array). All items of the array are the same as what the `GET /api/v1/plugins/fetch` endpoint returns.
 
 ## POST /api/v1/plugins/publish
 Publishes a plugin to the index. Data is passed in the JSON body.

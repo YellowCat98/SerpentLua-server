@@ -39,13 +39,14 @@ export async function entry(request, env, ctx) {
 		id: body.id,
 		script_example: body.script_example ?? "",
 		release_date: date,
-		last_update_date: date
+		last_update_date: date,
+		account_id: session.account_id
 	};
 
 	try {
 		await env.DB.prepare(`
-			INSERT INTO plugins (name, developer, version, serpent_version, description, download_link, id, script_example, release_date, last_update_date)
-			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
+			INSERT INTO plugins (name, developer, version, serpent_version, description, download_link, id, script_example, release_date, last_update_date, account_id)
+			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
 		`)
 		.bind(...Object.values(data))
 		.run();
