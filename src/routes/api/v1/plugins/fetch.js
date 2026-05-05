@@ -50,7 +50,7 @@ async function bulk(request, env, ctx) {
 	if (!sort) return new Response("Invalid sort.", { status: 400 });
 
 	let featured = params.get("featured");
-	if (!featured) featured = 0
+	if (!featured) featured = 0;
 	else featured = parseInt(featured);
 
 	let status = params.get("status");
