@@ -1,20 +1,17 @@
-// url/api/v1/plugin/publish
-// adds a new entry
+// url/api/v1/plugin/update
+// updates a plugin
 
 import * as utils from "./../../../../auth/helper.js"
-// lol!
 
 export async function entry(request, env, ctx) {
 	const url = new URL(request.url);
-	const body = await request.json(); // not using query parameters for this one
+	const body = await request.json();
 
 	const [session, err] = await utils.getSession(request, env);
 	if (err) return err;
-
+	
 	const status = await utils.getStatus(session.account_id, env);
 	if (status?.status === "banned") return new Response(status.ban_reason, { status: 403 });
-
-	const date = Math.floor(Date.now() / 1000);
 
 	const required = ["name", "developer", "id", "version", "serpent_version", "description", "download_link"];
 
@@ -29,6 +26,22 @@ export async function entry(request, env, ctx) {
 		return new Response(`Body is missing keys: ${JSON.stringify(missing)}`, { status: 400 });
 	}
 
+	// check ownership and if it exists first
+	const plugin = await env.DB.prepare("SELECT * FROM plugins WHERE id = ?").bind(body.id).first();
+	if (!plugin) {
+		return new Response(`Plugin of ID ${body.id} doesn't exist.`, { status: 404 });
+	}
+
+	let access = plugin.account_id === session.account_id;
+
+	if (!access) return new Response("You don't own this plugin.", { status: 403 });
+
+	// we can now proceed with updating
+
+	if (plugin.version === body.version) return new Response("Version must differ from the old one.", { status: 409 });
+
+	const date = Math.floor(Date.now() / 1000);
+
 	const data = {
 		name: body.name,
 		developer: body.developer,
@@ -36,27 +49,17 @@ export async function entry(request, env, ctx) {
 		serpent_version: body.serpent_version,
 		description: body.description,
 		download_link: body.download_link,
-		id: body.id,
 		script_example: body.script_example ?? "",
-		release_date: date,
 		last_update_date: date,
-		account_id: session.account_id
+		status: status?.status === "verified" ? "approved" : "pending"
 	};
 
-	try {
-		await env.DB.prepare(`
-			INSERT INTO plugins (name, developer, version, serpent_version, description, download_link, id, script_example, release_date, last_update_date, account_id)
-			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)
-		`)
-		.bind(...Object.values(data))
-		.run();
-	} catch (e) {
-		if (e.message.includes("UNIQUE constraint failed") || e.message.includes("PRIMARY KEY constraint failed")) {
-			return new Response("Another plugin already has this ID.", { status: 409 });
-		} else {
-			return new Response(`Internal error: ${e.message}`, { status: 500 });
-		}
-	}
+	const fields = Object.keys(data).map(k => `${k} = ?`).join(", ");
+	const values = [...Object.values(data), body.id];
 
-	return new Response(`ok`, { status: 201 });
+	await env.DB.prepare(`
+		UPDATE plugins SET ${fields} WHERE id = ?
+	`).bind(...values).run();
+
+	return new Response("ok", { status: 200 });
 }
