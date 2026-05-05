@@ -75,7 +75,7 @@ These are endpoints for performing staff-level actions.
 
 All of these endpoints require a session token passed as header `Authorization`.
 
-## PATCH /api/v1/moderator/set_plugin
+### PATCH /api/v1/moderator/set_plugin
 Updates a plugin's status.
 
 Query parameters required:
@@ -85,7 +85,7 @@ Query parameters required:
 
 Requires rank: `"staff"`.
 
-## PATCH /api/v1/moderator/set_user_status
+### PATCH /api/v1/moderator/set_user_status
 Updates an user's status.
 
 Query paramters required:
@@ -93,3 +93,14 @@ Query paramters required:
 - `account_id`
 - `status`: Optional. Will delete status if not provided (Helpful for unbanning and demoting staff.)
 - `ban_reason`: Can only be provided when `status` is `banned`. Optional.
+
+## Auth endpoints
+These are endpoints for authenticating with Argon.
+
+## POST /api/v1/auth/validate
+Creates the session and returns the token.
+
+Must pass in JSON body:
+
+- `account_id`
+- `argon_token`
