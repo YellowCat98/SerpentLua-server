@@ -5,7 +5,10 @@
 ## Terms used
 - Session token: Much like RobTop's GJP, but expires every 3 hours. Should reauthenticate each game start.
 
-## GET /api/v1/plugin/fetch
+## Plugin endpoints
+These are endpoints for plugins.
+
+### GET /api/v1/plugin/fetch
 Fetches a plugin's data based on query parameter `id`.
 
 Returns JSON object: (these are pretty self explanatory. Any unclear ones are stated)
@@ -29,7 +32,7 @@ Usage: `{url}/api/v1/plugin/fetch?id=six.seven`
 
 Check `Content-Type` prior to using the response returned, if it's not `application/json` it's probably an error.
 
-## GET /api/v1/plugin/fetch/bulk
+### GET /api/v1/plugin/fetch/bulk
 Fetches multiple plugins.
 
 Has query parameters:
@@ -44,7 +47,7 @@ Note that at least `ids` or `page` must be provided, `?sort=most_recent&featured
 
 Returns a JSON object (array). All items of the array are the same as what the `GET /api/v1/plugin/fetch` endpoint returns.
 
-## POST /api/v1/plugin/publish
+### POST /api/v1/plugin/publish
 Publishes a plugin to the index. Data is passed in the JSON body.
 
 Must pass Session token as a header `Authorization` to the request. otherwise the request will be cancelled.
@@ -60,9 +63,33 @@ JSON body must have: (These are self explanatory.)
 - `description`: A string.
 - `download_link`: A string.
 
-## PATCH /api/v1/plugin/update
+### PATCH /api/v1/plugin/update
 Updates an existing plugin on the index. Data is passed in the JSON body.
 
 Must pass session token as a header `Authorization` otherwise the request will be cancelled.
 
 The JSON body is the same as the `POST /api/v1/plugin/publish` endpoint.
+
+## Higher-level endpoints
+These are endpoints for performing staff-level actions.
+
+All of these endpoints require a session token passed as header `Authorization`.
+
+## PATCH /api/v1/moderator/set_plugin
+Updates a plugin's status.
+
+Query parameters required:
+
+- `id`
+- `status`: Can only be 3 values: `approved`, `pending`, `rejected`.
+
+Requires rank: `"staff"`.
+
+## PATCH /api/v1/moderator/set_user_status
+Updates an user's status.
+
+Query paramters required:
+
+- `account_id`
+- `status`: Optional. Will delete status if not provided (Helpful for unbanning and demoting staff.)
+- `ban_reason`: Can only be provided when `status` is `banned`. Optional.

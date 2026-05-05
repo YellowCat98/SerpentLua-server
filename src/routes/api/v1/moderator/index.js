@@ -1,7 +1,11 @@
 import { entry as set_plugin } from "./set_plugin.js"
+import { entry as set_user_status } from "./set_user_status.js"
+
+// this also includes admin stuff btw
 
 const routes = [
-	{ path: "/api/v1/staff/set_plugin", method: "PATCH", handler: set_plugin }
+	{ path: "/api/v1/moderator/set_plugin", method: "PATCH", handler: set_plugin },
+	{ path: "/api/v1/moderator/set_user_status", method: "PATCH", handler: set_user_status }
 ];
 
 export function entry(request, env, ctx) {

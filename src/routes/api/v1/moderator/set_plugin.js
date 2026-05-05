@@ -1,5 +1,5 @@
-// url/api/v1/staff/update_status
-// sets whether an user is banned or not (for admin, can erase user)
+// url/api/v1/moderator/update_status
+// approves/rejects plugins (and pendings plugins its called flexibility)
 
 import * as utils from "../../../../utils.js"
 
