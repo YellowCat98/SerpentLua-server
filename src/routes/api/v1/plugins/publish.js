@@ -12,7 +12,7 @@ export async function entry(request, env, ctx) {
 	if (err) return err;
 
 	const status = await utils.getStatus(session.account_id, env);
-	if (status?.status === "banned") return new Response(status.ban_reason, { status: 403 });
+	if (status?.status === "banned") return new Response("Forbidden", { status: 403 });
 
 	const date = Math.floor(Date.now() / 1000);
 
