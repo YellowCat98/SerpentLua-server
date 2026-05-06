@@ -11,7 +11,10 @@ export async function entry(request, env, ctx) {
 	if (err) return err;
 	
 	const status = await utils.getStatus(session.account_id, env);
-	if (status?.status === "banned") return new Response(status.ban_reason, { status: 403 });
+	if (status?.status === "banned") return new Response(JSON.stringify({
+		status: "banned",
+		ban_reason: status?.ban_reason
+	}), { status: 403 , headers: { "Content-Type": "application/json" }});
 
 	const required = ["name", "developer", "id", "version", "serpent_version", "description", "download_link"];
 
@@ -51,7 +54,9 @@ export async function entry(request, env, ctx) {
 		download_link: body.download_link,
 		script_example: body.script_example ?? "",
 		last_update_date: date,
-		status: utils.resolveStatus(status?.status, "verified") ? "approved" : "pending"
+		status: utils.resolveStatus(status?.status, "verified") ? "approved" : "pending",
+		download_hash: await utils.getDownloadHash(body.download_link),
+		script_download_hash: await utils.getDownloadHash(body.script_example) ?? ""
 	};
 
 	const fields = Object.keys(data).map(k => `${k} = ?`).join(", ");

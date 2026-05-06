@@ -1,0 +1,1 @@
+ALTER TABLE plugins ADD COLUMN script_download_hash TEXT DEFAULT "";

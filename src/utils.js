@@ -37,3 +37,15 @@ export const ranks = ["banned", "verified", "staff", "admin", "owner"];
 export function resolveStatus(status, required) {
 	return ranks.indexOf(status) >= ranks.indexOf(required);
 }
+
+// much like geode, we store this so when you download we actually compare hashes!
+export async function getDownloadHash(url) {
+	if (!url) return null;
+	const res = await fetch(url);
+	const buffer = await res.arrayBuffer();
+	const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+	const hashArray = Array.from(new Uint8Array(hashBuffer));
+	const hash = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+	return `sha256:${hash}`;
+}
