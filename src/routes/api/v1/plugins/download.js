@@ -7,7 +7,7 @@ export async function entry(request, env, ctx) {
 	const params = url.searchParams;
 
 	const id = params.get("id");
-	if (!id) return new Response("Missing parameter `id`", { status: 400 });
+	if (id === null) return new Response("Missing parameter `id`", { status: 400 });
 
 	let script = !!parseInt(params.get("script"));
 
@@ -28,7 +28,7 @@ export async function entry(request, env, ctx) {
 		SELECT download_count, ${link}, ${hash} FROM plugins WHERE id = ?
 	`).bind(id).first();
 
-	if (!plugin) return new Response(`Plugin ${id} doesn't exist.`, { status: 404 });
+	if (plugin === null) return new Response(`Plugin ${id} doesn't exist.`, { status: 404 });
 
 	// now we check da hash
 

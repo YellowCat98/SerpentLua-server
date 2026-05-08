@@ -5,9 +5,9 @@ async function single(request, env, ctx) {
 	const url = new URL(request.url);
 	const params = url.searchParams;
 
-	if (!params.get("id")) return new Response("Missing query parameter `id`.", { status: 400 });
+	if (params.get("id") === null) return new Response("Missing query parameter `id`.", { status: 400 });
 
-	const plugin = await env.DB.prepare("SELECT * from plugins WHERE id = ?1")
+	const plugin = await env.DB.prepare("SELECT * FROM plugins WHERE id = ?1")
 		.bind(params.get("id"))
 		.first();
 	
@@ -45,24 +45,24 @@ async function bulk(request, env, ctx) {
 	let output = []
 
 	let sort = params.get("sort");
-	if (!sort) return new Response("Invalid sort.", { status: 400 });
+	if (sort === null) return new Response("Invalid sort.", { status: 400 });
 	sort = sorts[sort];
-	if (!sort) return new Response("Invalid sort.", { status: 400 });
+	if (sort === null) return new Response("Invalid sort.", { status: 400 });
 
 	let featured = params.get("featured");
-	if (!featured) featured = 0;
+	if (featured === null) featured = 0;
 	else featured = parseInt(featured);
 
 	const featuredClause = featured ? "AND featured = ?" : "";
 	
 
 	let status = params.get("status");
-	if (!status) status = "approved";
+	if (status === null) status = "approved";
 	status = statuses[status];
-	if (!status) status = "approved";
+	if (status === null) status = "approved";
 
 	let page = params.get("page");
-	if (page) {
+	if (page !== null) {
 		page = parseInt(page);
 		if (isNaN(page)) return new Response("page is NaN.", { status: 400 });
 

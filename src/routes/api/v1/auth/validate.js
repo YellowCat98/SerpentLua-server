@@ -7,7 +7,7 @@ export async function entry(request, env, ctx) {
 	const url = new URL(request.url);
 	const body = await request.json();
 
-	if (!body.account_id || !body.argon_token) return new Response("Missing parameters.", { status: 400 });
+	if (body.account_id === null || body.argon_token === null) return new Response("Missing parameters.", { status: 400 });
 
 	const base_url = "https://argon.globed.dev/v1";
 

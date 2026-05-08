@@ -16,16 +16,19 @@ export async function entry(request, env, ctx) {
 	// now we update!
 
 	const id = params.get("id");
-	if (!id) return new Response("Missing parameter `id`", { status: 400 });
+	if (id === null) return new Response("Missing parameter `id`", { status: 400 });
 
 	const status = params.get("status");
-	if (!status) return new Response("Missing parameter `status`", { status: 400 });
+	if (status === null) return new Response("Missing parameter `status`", { status: 400 });
 
 	if (!["approved", "pending", "rejected"].includes(status)) return new Response("Invalid `status`", { status: 400 });
 
+	let featured = params.get("featured");
+	if (featured === null) featured = await env.DB.prepare("SELECT * FROM plugins WHERE id = ?").bind(id).first("featured");
+
 	await env.DB.prepare(`
-		UPDATE plugins SET status = ? WHERE id = ?
-	`).bind(status, id).run();
+		UPDATE plugins SET status = ?, featured = ? WHERE id = ?
+	`).bind(status, featured, id).run();
 
 	return new Response("ok", { status: 200 });
 }

@@ -31,7 +31,7 @@ export async function entry(request, env, ctx) {
 
 	// check ownership and if it exists first
 	const plugin = await env.DB.prepare("SELECT * FROM plugins WHERE id = ?").bind(body.id).first();
-	if (!plugin) {
+	if (plugin === null) {
 		return new Response(`Plugin of ID ${body.id} doesn't exist.`, { status: 404 });
 	}
 

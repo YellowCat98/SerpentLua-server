@@ -47,7 +47,7 @@ export async function entry(request, env, ctx) {
 		binds = [account_id, status];
 	}
 
-	if (!status) {
+	if (status === null) {
 		await env.DB.prepare(`
 			DELETE from user_status WHERE account_id = ?
 		`).bind(account_id).run();
