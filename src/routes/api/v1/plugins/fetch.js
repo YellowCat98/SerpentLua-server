@@ -42,8 +42,6 @@ async function bulk(request, env, ctx) {
 	const url = new URL(request.url);
 	const params = url.searchParams;
 
-	let output = []
-
 	let sort = params.get("sort");
 	if (sort === null) return new Response("Invalid sort.", { status: 400 });
 	sort = sorts[sort];
@@ -70,32 +68,48 @@ async function bulk(request, env, ctx) {
 		
 		const offset = (page - 1) * 10;
 		const binds = featured ? [status, featured, offset] : [status, offset];
-		const { results } = await env.DB.prepare(`
-			SELECT * FROM plugins WHERE status = ? ${featuredClause}
-			ORDER BY ${sort} DESC
-			limit 10 OFFSET ?
-		`).bind(...binds).all();
+		const countBinds = featured ? [status, featured] : [status];
+		const [{ results }, countResult] = await Promise.all([
+			env.DB.prepare(`
+				SELECT * FROM plugins WHERE status = ? ${featuredClause}
+				ORDER BY ${sort} DESC
+				limit 10 OFFSET ?
+			`).bind(...binds).all(),
 
-		output = results;
-	} else {
-		let ids = params.get("ids");
-		if (!ids) return new Response("Missing params.", { status: 400 });
-		ids = ids.split(",").filter(s => s.length > 0).map(s => s.trim());
-		if (ids.length >= 20) return new Response("Too many IDs.", { status: 400 });
+			env.DB.prepare(`
+				SELECT COUNT(*) as count FROM plugins WHERE status = ? ${featuredClause}
+			`).bind(...countBinds).first()
+		]);
 
-		const placeholders = ids.map(() => "?").join(",");
+		const total = countResult.count;
+		const totalPages = Math.ceil(total / perPage);
 
-		const binds = featured ? [...ids, status, featured] : [...ids, status];
-		const { results } = await env.DB.prepare(`
-			SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = ? ${featuredClause}
-			ORDER BY ${sort} DESC
-		`).bind(...binds).all();
-
-		output = results
+		return new Response(JSON.stringify({
+			items: results,
+			page,
+			total,
+			total_pages: totalPages,
+			has_prev: page > 1,
+			has_next: page < totalPages
+		}),
+		{ headers: { "Content-Type": "application/json" }});
 	}
 
+	let ids = params.get("ids");
+	if (!ids) return new Response("Missing params.", { status: 400 });
+	ids = ids.split(",").filter(s => s.length > 0).map(s => s.trim());
+	if (ids.length >= 20) return new Response("Too many IDs.", { status: 400 });
+
+	const placeholders = ids.map(() => "?").join(",");
+
+	const binds = featured ? [...ids, status, featured] : [...ids, status];
+	const { results } = await env.DB.prepare(`
+		SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = ? ${featuredClause}
+		ORDER BY ${sort} DESC
+	`).bind(...binds).all();
+
 	return new Response(
-		JSON.stringify(output),
+		JSON.stringify(results),
 		{
 			headers: { "Content-Type": "application/json" }
 		}
