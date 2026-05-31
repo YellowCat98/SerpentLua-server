@@ -49,3 +49,13 @@ export async function getDownloadHash(url) {
 
 	return `sha256:${hash}`;
 }
+
+export function getFilename(url) {
+	try {
+		const parts = new URL(url).pathname.split("/").filter(Boolean);
+		const filename = parts.pop();
+		return filename ? decodeURIComponent(filename) : null;
+	} catch (e) {
+		return null;
+	}
+}

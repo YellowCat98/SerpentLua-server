@@ -43,13 +43,15 @@ export async function entry(request, env, ctx) {
 		account_id: session.account_id,
 		download_hash: await utils.getDownloadHash(body.download_link),
 		script_download_hash: await utils.getDownloadHash(body.script_example) ?? "",
-		source: body.source
+		source: body.source,
+		filename: utils.getFilename(body.download_link),
+		script_filename: utils.getFilename(body.script_example) ?? ""
 	};
 
 	try {
 		await env.DB.prepare(`
-			INSERT INTO plugins (name, developer, version, serpent_version, description, download_link, id, script_example, release_date, last_update_date, account_id, download_hash, script_download_hash, source)
-			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)
+			INSERT INTO plugins (name, developer, version, serpent_version, description, download_link, id, script_example, release_date, last_update_date, account_id, download_hash, script_download_hash, source, filename, script_filename)
+			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)
 		`)
 		.bind(...Object.values(data))
 		.run();

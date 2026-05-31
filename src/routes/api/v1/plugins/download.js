@@ -44,17 +44,14 @@ export async function entry(request, env, ctx) {
 		allow = currentHash === newHash;
 	}
 
-	if (!allow) {
-		return new Response("Hash mismatch", { status: 409 });
-	} else {
-		if (!script) {
-			await env.DB.prepare(`
-				UPDATE plugins SET download_count = ? WHERE id = ?
-			`).bind(plugin.download_count+1, id).run();
+	if (!allow) return new Response("Hash mismatch", { status: 409 });
 
-			return Response.redirect(plugin.download_link, 302);
-		} else {
-			return Response.redirect(plugin.script_example, 302);
-		}
+	const downloadUrl = !script ? plugin.download_link : plugin.script_example;
+
+	if (!script) {
+		await env.DB.prepare(`
+			UPDATE plugins SET download_count = ? WHERE id = ?
+		`).bind(plugin.download_count+1, id).run();
 	}
+	return Response.redirect(downloadUrl, 302);
 }
