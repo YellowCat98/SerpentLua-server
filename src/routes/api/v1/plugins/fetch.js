@@ -10,19 +10,19 @@ async function single(request, env, ctx) {
 	const plugin = await env.DB.prepare("SELECT * FROM plugins WHERE id = ?1")
 		.bind(params.get("id"))
 		.first();
-	
-	plugin.featured = !!plugin.featured;
 
 	if (plugin === null) {
 		return new Response(`Plugin of ID \"${params.get("id")}\" was not found.`, { status: 404 });
-	} else {
-		return new Response( // looks way prettier if i wrap this one in else
-			JSON.stringify(plugin),
-			{
-				headers: { "Content-Type": "application/json" }
-			}
-		);
 	}
+	
+	plugin.featured = !!plugin.featured;
+
+	return new Response(
+		JSON.stringify(plugin),
+		{
+			headers: { "Content-Type": "application/json" }
+		}
+	);
 }
 
 const sorts = {
