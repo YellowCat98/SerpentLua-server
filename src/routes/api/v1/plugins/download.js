@@ -30,22 +30,6 @@ export async function entry(request, env, ctx) {
 
 	if (plugin === null) return new Response(`Plugin ${id} doesn't exist.`, { status: 404 });
 
-	// now we check da hash
-
-	if (!script) {
-		const currentHash = plugin.download_hash;
-		const newHash = await utils.getDownloadHash(plugin.download_link);
-
-		allow = currentHash === newHash;
-	} else {
-		const currentHash = plugin.script_download_hash;
-		const newHash = await utils.getDownloadHash(plugin.script_example);
-
-		allow = currentHash === newHash;
-	}
-
-	if (!allow) return new Response("Hash mismatch", { status: 409 });
-
 	const downloadUrl = !script ? plugin.download_link : plugin.script_example;
 
 	if (!script) {
