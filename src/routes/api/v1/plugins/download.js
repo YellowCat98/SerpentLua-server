@@ -11,21 +11,14 @@ export async function entry(request, env, ctx) {
 
 	let script = !!parseInt(params.get("script"));
 
-
 	let link;
-	let hash;
-	if (!script) {
-		link = "download_link";
-		hash = "download_hash";
-	} else {
-		link = "script_example";
-		hash = "script_download_hash";
-	}
+	if (!script) link = "download_link";
+	else link = "script_example";
 
 	let allow; // i couldnt think of a good name for whether we allow redirecting or not
 
 	const plugin = await env.DB.prepare(`
-		SELECT download_count, ${link}, ${hash} FROM plugins WHERE id = ?
+		SELECT download_count, ${link} FROM plugins WHERE id = ?
 	`).bind(id).first();
 
 	if (plugin === null) return new Response(`Plugin ${id} doesn't exist.`, { status: 404 });
