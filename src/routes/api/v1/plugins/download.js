@@ -9,7 +9,7 @@ export async function entry(request, env, ctx) {
 	const id = params.get("id");
 	if (id === null) return new Response("Missing parameter `id`", { status: 400 });
 
-	let script = !!parseInt(params.get("script"));
+	let script = params.get("script") === "1";
 
 	let link;
 	if (!script) link = "download_link";
