@@ -63,5 +63,26 @@ export async function entry(request, env, ctx) {
 		}
 	}
 
+	const webhook = env.DISCORD_WEBHOOK;
+
+	const req = await fetch(webhook, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			embeds: [
+				{
+					title: `Plugin Published: ${data.name}`,
+					description: `Published by: ${data.developer}`,
+
+					footer: {
+						text: `Plugin ID: ${data.id}`
+					}
+				}
+			]
+		})
+	});
+
 	return new Response(`ok`, { status: 201 });
 }
