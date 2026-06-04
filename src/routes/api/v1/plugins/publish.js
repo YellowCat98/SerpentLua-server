@@ -16,7 +16,7 @@ export async function entry(request, env, ctx) {
 
 	const date = Math.floor(Date.now() / 1000);
 
-	const required = ["name", "developer", "id", "version", "serpent_version", "description", "download_link", "source"];
+	const required = ["name", "developer", "id", "version", "serpent_version", "description", "download_link", "download_hash", "source"];
 
 	const missing = [];
 	for (const field of required) {
@@ -41,8 +41,8 @@ export async function entry(request, env, ctx) {
 		release_date: date,
 		last_update_date: date,
 		account_id: session.account_id,
-		download_hash: await utils.getDownloadHash(body.download_link),
-		script_download_hash: await utils.getDownloadHash(body.script_example) ?? "",
+		download_hash: body.download_hash,
+		script_download_hash: body.script_download_hash ?? "",
 		source: body.source,
 		filename: utils.getFilename(body.download_link),
 		script_filename: utils.getFilename(body.script_example) ?? ""

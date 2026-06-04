@@ -16,7 +16,7 @@ export async function entry(request, env, ctx) {
 		ban_reason: status?.ban_reason
 	}), { status: 403 , headers: { "Content-Type": "application/json" }});
 
-	const required = ["name", "developer", "id", "version", "serpent_version", "description", "download_link"];
+	const required = ["name", "developer", "id", "version", "serpent_version", "description", "download_link", "download_hash"];
 
 	const missing = [];
 	for (const field of required) {
@@ -55,8 +55,8 @@ export async function entry(request, env, ctx) {
 		script_example: body.script_example ?? "",
 		last_update_date: date,
 		status: utils.resolveStatus(status?.status, "verified") ? "approved" : "pending",
-		download_hash: await utils.getDownloadHash(body.download_link),
-		script_download_hash: await utils.getDownloadHash(body.script_example) ?? ""
+		download_hash: body.download_hash,
+		script_download_hash: body.script_download_hash ?? ""
 	};
 
 	const fields = Object.keys(data).map(k => `${k} = ?`).join(", ");

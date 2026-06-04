@@ -39,6 +39,7 @@ export function resolveStatus(status, required) {
 }
 
 // much like geode, we store this so when you download we actually compare hashes!
+/*
 export async function getDownloadHash(url) {
 	if (!url) return null;
 	const res = await fetch(url);
@@ -49,6 +50,7 @@ export async function getDownloadHash(url) {
 
 	return `sha256:${hash}`;
 }
+*/
 
 export function getFilename(url) {
 	try {
