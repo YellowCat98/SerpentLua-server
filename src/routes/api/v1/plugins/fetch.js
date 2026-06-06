@@ -5,14 +5,15 @@ async function single(request, env, ctx) {
 	const url = new URL(request.url);
 	const params = url.searchParams;
 
-	if (params.get("id") === null) return new Response("Missing query parameter `id`.", { status: 400 });
+	const id = params.get("id");
+	if (id === null) return new Response("Missing query parameter `id`.", { status: 400 });
 
 	const plugin = await env.DB.prepare("SELECT * FROM plugins WHERE id = ?1")
-		.bind(params.get("id"))
+		.bind(id)
 		.first();
 
 	if (plugin === null) {
-		return new Response(`Plugin of ID \"${params.get("id")}\" was not found.`, { status: 404 });
+		return new Response(`Plugin of ID "${id}" was not found.`, { status: 404 });
 	}
 	
 	plugin.featured = !!plugin.featured;

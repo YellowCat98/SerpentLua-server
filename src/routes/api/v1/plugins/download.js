@@ -21,7 +21,7 @@ export async function entry(request, env, ctx) {
 		SELECT download_count, ${link} FROM plugins WHERE id = ?
 	`).bind(id).first();
 
-	if (plugin === null) return new Response(`Plugin ${id} doesn't exist.`, { status: 404 });
+	if (plugin === null) return new Response(`Plugin of ID "${id}" was not found.`, { status: 404 });
 
 	const downloadUrl = !script ? plugin.download_link : plugin.script_example;
 

@@ -25,6 +25,11 @@ export async function entry(request, env, ctx) {
 
 	let featured = params.get("featured");
 	if (featured === null) featured = await env.DB.prepare("SELECT * FROM plugins WHERE id = ?").bind(id).first("featured");
+	else featured = featured === "1";
+
+	if (!utils.pluginExists(id, env)) {
+		return new Response(`Plugin of ID "${id}" was not found.`, { status: 404 });
+	}
 
 	await env.DB.prepare(`
 		UPDATE plugins SET status = ?, featured = ? WHERE id = ?

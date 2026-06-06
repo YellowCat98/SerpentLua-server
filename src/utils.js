@@ -86,3 +86,11 @@ export async function sendWebhook(data, env) {
 		})
 	});
 }
+
+export async function pluginExists(id, env) {
+	const plugin = await env.DB.prepare(`
+		SELECT id FROM plugins WHERE id = ?
+	`).bind(id).first();
+
+	return !!plugin;
+}
