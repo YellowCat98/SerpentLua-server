@@ -45,6 +45,8 @@ export async function entry(request, env, ctx) {
 
 	const date = Math.floor(Date.now() / 1000);
 
+	const plugin_status = utils.resolveStatus(status?.status, "verified") ? "approved" : "pending";
+
 	const data = {
 		name: body.name,
 		developer: body.developer,
@@ -54,7 +56,7 @@ export async function entry(request, env, ctx) {
 		download_link: body.download_link,
 		script_example: body.script_example ?? "",
 		last_update_date: date,
-		status: utils.resolveStatus(status?.status, "verified") ? "approved" : "pending",
+		status: plugin_status,
 		download_hash: body.download_hash,
 		script_download_hash: body.script_download_hash ?? ""
 	};
@@ -65,6 +67,10 @@ export async function entry(request, env, ctx) {
 	await env.DB.prepare(`
 		UPDATE plugins SET ${fields} WHERE id = ?
 	`).bind(...values).run();
+
+	if (plugin_status === "approved") {
+		await utils.sendWebhook(data, false, "✅ A wild plugin has been approved!", env);
+	}
 
 	return new Response("ok", { status: 200 });
 }
