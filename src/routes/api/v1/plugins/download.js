@@ -15,8 +15,6 @@ export async function entry(request, env, ctx) {
 	if (!script) link = "download_link";
 	else link = "script_example";
 
-	let allow; // i couldnt think of a good name for whether we allow redirecting or not
-
 	const plugin = await env.DB.prepare(`
 		SELECT download_count, ${link} FROM plugins WHERE id = ?
 	`).bind(id).first();
