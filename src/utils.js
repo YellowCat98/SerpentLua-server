@@ -48,8 +48,8 @@ export function getFilename(url) {
 	}
 }
 
-export async function sendWebhook(data, env) {
-	const webhook = env.DISCORD_WEBHOOK;
+export async function sendWebhook(data, priv, additions, env) {
+	const webhook = priv ? env.DISCORD_PRIV_WEBHOOK : env.DISCORD_PUB_WEBHOOK;
 
 	return await fetch(webhook, {
 		method: "POST",
@@ -57,11 +57,11 @@ export async function sendWebhook(data, env) {
 			"Content-Type": "application/json"
 		},
 		body: JSON.stringify({
+			content: additions ?? undefined,
 			embeds: [
 				{
 					color: 0x5865F2,
-					title: `🧩 ${data.name}`,
-					url: data.source ?? null,
+					title: `${data.name}`,
 					description: data.description ?? "No description provided.",
 					fields: [
 						{

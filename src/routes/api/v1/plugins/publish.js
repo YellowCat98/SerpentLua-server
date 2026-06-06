@@ -63,7 +63,7 @@ export async function entry(request, env, ctx) {
 		}
 	}
 
-	await utils.sendWebhook(data, env);
+	await utils.sendWebhook(data, true, "Plugin Published.", env);
 
 	return new Response(`ok`, { status: 201 });
 }

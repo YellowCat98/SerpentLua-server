@@ -27,13 +27,21 @@ export async function entry(request, env, ctx) {
 	if (featured === null) featured = await env.DB.prepare("SELECT * FROM plugins WHERE id = ?").bind(id).first("featured");
 	else featured = featured === "1";
 
-	if (!utils.pluginExists(id, env)) {
+	if (!(await utils.pluginExists(id, env))) {
 		return new Response(`Plugin of ID "${id}" was not found.`, { status: 404 });
 	}
 
 	await env.DB.prepare(`
 		UPDATE plugins SET status = ?, featured = ? WHERE id = ?
 	`).bind(status, featured, id).run();
+
+	// now onto the webhook!
+
+	if (status === "approved") {
+		await utils.sendWebhook(await env.DB.prepare(`
+			SELECT * FROM plugins WHERE id = ?
+		`).bind(id).first(), false, featured ? "⭐ A wild plugin has been featured!" : "✅ A wild plugin has been approved!", env);
+	}
 
 	return new Response("ok", { status: 200 });
 }
