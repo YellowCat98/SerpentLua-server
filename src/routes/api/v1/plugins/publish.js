@@ -73,12 +73,28 @@ export async function entry(request, env, ctx) {
 		body: JSON.stringify({
 			embeds: [
 				{
-					title: `Plugin Published: ${data.name}`,
-					description: `Published by: ${data.developer}`,
-
-					footer: {
-						text: `Plugin ID: ${data.id}`
-					}
+					color: 0x5865F2,
+					title: `🧩 ${data.name}`,
+					url: data.source ?? null,
+					description: data.description ?? "No description provided.",
+					fields: [
+						{
+							name: "Developer",
+							value: data.developer,
+							inline: true
+						},
+						{
+							name: "Version",
+							value: `\`${data.version}\``,
+							inline: true
+						},
+						{
+							name: "Plugin ID",
+							value: `\`${data.id}\``,
+							inline: true
+						}
+					],
+					timestamp: new Date().toISOString()
 				}
 			]
 		})
