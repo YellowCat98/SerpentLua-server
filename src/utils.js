@@ -62,13 +62,8 @@ export async function sendWebhook(data, priv, additions, env) {
 				{
 					color: 0x5865F2,
 					title: `${data.name}`,
-					description: data.description ?? "No description provided.",
+					description: data.description ?? "",
 					fields: [
-						{
-							name: "Developer",
-							value: data.developer,
-							inline: true
-						},
 						{
 							name: "Version",
 							value: `\`${data.version}\``,
