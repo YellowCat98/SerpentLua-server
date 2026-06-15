@@ -11,12 +11,9 @@ export async function entry(request, env, ctx) {
 	if (err) return err;
 	
 	const status = await utils.getStatus(session.account_id, env);
-	if (status?.status === "banned") return new Response(JSON.stringify({
-		status: "banned",
-		ban_reason: status?.ban_reason
-	}), { status: 403 , headers: { "Content-Type": "application/json" }});
+	if (status?.status === "banned") return new Response("Forbidden", { status: 403 });
 
-	const required = ["name", "developer", "id", "version", "serpent_version", "description", "download_link", "download_hash"];
+	const required = ["name", "id", "version", "serpent_version", "description", "download_link", "download_hash"];
 
 	const missing = [];
 	for (const field of required) {
@@ -49,7 +46,6 @@ export async function entry(request, env, ctx) {
 
 	const data = {
 		name: body.name,
-		developer: body.developer,
 		version: body.version,
 		serpent_version: body.serpent_version,
 		description: body.description,

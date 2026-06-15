@@ -16,7 +16,7 @@ export async function entry(request, env, ctx) {
 
 	const date = Math.floor(Date.now() / 1000);
 
-	const required = ["name", "developer", "id", "version", "serpent_version", "description", "download_link", "download_hash", "source"];
+	const required = ["name", "id", "version", "serpent_version", "description", "download_link", "download_hash", "source"];
 
 	const missing = [];
 	for (const field of required) {
@@ -31,7 +31,6 @@ export async function entry(request, env, ctx) {
 
 	const data = {
 		name: body.name,
-		developer: body.developer,
 		version: body.version,
 		serpent_version: body.serpent_version,
 		description: body.description,
@@ -50,8 +49,8 @@ export async function entry(request, env, ctx) {
 
 	try {
 		await env.DB.prepare(`
-			INSERT INTO plugins (name, developer, version, serpent_version, description, download_link, id, script_example, release_date, last_update_date, account_id, download_hash, script_download_hash, source, filename, script_filename)
-			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)
+			INSERT INTO plugins (name, version, serpent_version, description, download_link, id, script_example, release_date, last_update_date, account_id, download_hash, script_download_hash, source, filename, script_filename)
+			VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)
 		`)
 		.bind(...Object.values(data))
 		.run();
