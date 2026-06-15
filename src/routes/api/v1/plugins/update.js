@@ -64,8 +64,15 @@ export async function entry(request, env, ctx) {
 		UPDATE plugins SET ${fields} WHERE id = ?
 	`).bind(...values).run();
 
+	const webhookData = {
+		...data,
+		id: body.id
+	}
+
 	if (plugin_status === "approved") {
-		await utils.sendWebhook(data, false, "✅ A wild plugin has been approved!", env);
+		await utils.sendWebhook(webhookData, false, "✅ A wild plugin has been updated!", env);
+	} else {
+		await utils.sendWebhook(webhookData, true, "Plugin update pending review.", env);
 	}
 
 	return new Response("ok", { status: 200 });
