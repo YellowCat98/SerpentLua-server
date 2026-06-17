@@ -52,8 +52,10 @@ async function bulk(request, env, ctx) {
 	if (featured === null) featured = 0;
 	else featured = parseInt(featured);
 
-	const featuredClause = featured ? "AND featured = ?" : "";
-	
+	const featuredClause = (featured !== null) ? "AND featured = ?" : "";
+
+	let accountID = params.get("account_id");
+	const accountClause = (accountID !== null) ? "AND account_id = ?" : "";
 
 	let status = params.get("status");
 	if (status === null) status = "approved";
@@ -68,17 +70,25 @@ async function bulk(request, env, ctx) {
 		const perPage = 10;
 		
 		const offset = (page - 1) * 10;
-		const binds = featured ? [status, featured, offset] : [status, offset];
-		const countBinds = featured ? [status, featured] : [status];
+		
+		const binds = [status];
+		if (featured !== null) binds.push(featured);
+		if (accountID !== null) binds.push(accountID);
+		binds.push(offset);
+
+		const countBinds = [status];
+		if (featured !== null) countBinds.push(featured);
+		if (accountID !== null) countBinds.push(accountID);
+
 		const [{ results }, countResult] = await Promise.all([
 			env.DB.prepare(`
-				SELECT * FROM plugins WHERE status = ? ${featuredClause}
+				SELECT * FROM plugins WHERE status = ? ${featuredClause} ${accountClause}
 				ORDER BY ${sort} DESC
 				limit 10 OFFSET ?
 			`).bind(...binds).all(),
 
 			env.DB.prepare(`
-				SELECT COUNT(*) as count FROM plugins WHERE status = ? ${featuredClause}
+				SELECT COUNT(*) as count FROM plugins WHERE status = ? ${featuredClause} ${accountClause}
 			`).bind(...countBinds).first()
 		]);
 
@@ -103,9 +113,12 @@ async function bulk(request, env, ctx) {
 
 	const placeholders = ids.map(() => "?").join(",");
 
-	const binds = featured ? [...ids, status, featured] : [...ids, status];
+	const binds = [...ids, status];
+	if (featured !== null) binds.push(featured);
+	if (accountID !== null) binds.push(accountID);
+	
 	const { results } = await env.DB.prepare(`
-		SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = ? ${featuredClause}
+		SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = ? ${featuredClause} ${accountClause}
 		ORDER BY ${sort} DESC
 	`).bind(...binds).all();
 
