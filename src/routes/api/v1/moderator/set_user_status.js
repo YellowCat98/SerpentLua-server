@@ -19,6 +19,7 @@ export async function entry(request, env, ctx) {
 
 	if (utils.resolveStatus(user_status?.status, "owner")) modify_allowed = utils.ranks; // i might change this in the future to be more lenient idk
 	else if (utils.resolveStatus(user_status?.status, "staff")) modify_allowed = ["banned"];
+	else if (utils.resolveStatus(user_status?.status, "admin")) modify_allowed = ["banned", "verified"];
 	else return new Response("Forbidden", { status: 403 });
 
 
@@ -28,11 +29,13 @@ export async function entry(request, env, ctx) {
 	if (session.account_id === account_id) return new Response("Cannot modify own status", { status: 403 });
 
 	const target_status = await utils.getStatus(account_id, env);
+	const proper_status = target_status?.status ?? null; // fuck javascript
 
-	if (utils.resolveStatus(target_status?.status, user_status?.status)) return new Response("Cannot modify one of equal status", { status: 403 });
+	if (utils.resolveStatus(target_status?.status, user_status?.status)) return new Response("Cannot modify one of equal or higher status", { status: 403 });
 
 
-	const status = params.get("status");
+	let status = params.get("status");
+	if (status === "" || status === undefined) status = null;
 
 	const ban_reason = params.get("ban_reason");
 	
@@ -48,6 +51,7 @@ export async function entry(request, env, ctx) {
 	}
 
 	if (status === null) {
+		if (proper_status !== null && !modify_allowed.includes(proper_status)) return new Response("Forbidden", { status: 403 });
 		await env.DB.prepare(`
 			DELETE from user_status WHERE account_id = ?
 		`).bind(account_id).run();
