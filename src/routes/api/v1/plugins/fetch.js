@@ -58,9 +58,11 @@ async function bulk(request, env, ctx) {
 	const accountClause = (accountID !== null) ? "AND account_id = ?" : "";
 
 	let status = params.get("status");
-	if (status === null) status = "approved";
-	status = statuses[status];
-	if (status === null) status = "approved";
+	if (status !== null) {
+		status = statuses[status];
+		if (status === undefined) return new Response("Invalid status.", { status: 400 });
+	}
+	const statusClause = (status !== null) ? "AND status = ?" : "";
 
 	let page = params.get("page");
 	if (page !== null) {
@@ -71,24 +73,26 @@ async function bulk(request, env, ctx) {
 		
 		const offset = (page - 1) * 10;
 		
-		const binds = [status];
+		const binds = [];
+		if (status !== null) binds.push(status);
 		if (featured !== null) binds.push(featured);
 		if (accountID !== null) binds.push(accountID);
 		binds.push(offset);
 
-		const countBinds = [status];
+		const countBinds = [];
+		if (status !== null) countBinds.push(status);
 		if (featured !== null) countBinds.push(featured);
 		if (accountID !== null) countBinds.push(accountID);
 
 		const [{ results }, countResult] = await Promise.all([
 			env.DB.prepare(`
-				SELECT * FROM plugins WHERE status = ? ${featuredClause} ${accountClause}
+				SELECT * FROM plugins WHERE 1=1 ${statusClause} ${featuredClause} ${accountClause}
 				ORDER BY ${sort} DESC
 				limit 10 OFFSET ?
 			`).bind(...binds).all(),
 
 			env.DB.prepare(`
-				SELECT COUNT(*) as count FROM plugins WHERE status = ? ${featuredClause} ${accountClause}
+				SELECT COUNT(*) as count FROM plugins WHERE 1=1 ${statusClause} ${featuredClause} ${accountClause}
 			`).bind(...countBinds).first()
 		]);
 
@@ -118,7 +122,7 @@ async function bulk(request, env, ctx) {
 	if (accountID !== null) binds.push(accountID);
 	
 	const { results } = await env.DB.prepare(`
-		SELECT * FROM plugins WHERE id IN (${placeholders}) AND status = ? ${featuredClause} ${accountClause}
+		SELECT * FROM plugins WHERE id IN (${placeholders}) ${statusClause} ${featuredClause} ${accountClause}
 		ORDER BY ${sort} DESC
 	`).bind(...binds).all();
 
