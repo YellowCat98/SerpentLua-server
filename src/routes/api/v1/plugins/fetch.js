@@ -117,7 +117,8 @@ async function bulk(request, env, ctx) {
 
 	const placeholders = ids.map(() => "?").join(",");
 
-	const binds = [...ids, status];
+	const binds = [...ids];
+	if (status !== null) binds.push(status);
 	if (featured !== null) binds.push(featured);
 	if (accountID !== null) binds.push(accountID);
 	
