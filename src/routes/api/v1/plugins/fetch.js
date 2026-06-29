@@ -48,9 +48,7 @@ async function bulk(request, env, ctx) {
 	sort = sorts[sort];
 	if (sort === null) return new Response("Invalid sort.", { status: 400 });
 
-	let featured = params.get("featured");
-	if (featured === null) featured = 0;
-	else featured = parseInt(featured);
+	const featured = params.get("featured");
 
 	const featuredClause = (featured !== null) ? "AND featured = ?" : "";
 
